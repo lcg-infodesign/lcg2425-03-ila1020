@@ -73,7 +73,7 @@ function mapTemperatureToColor(temp) {
 function drawGlyphs(x, y, size, data) {
   let colorForTemp = mapTemperatureToColor(data.max_temp);
   let borderColorForMinTemp = mapTemperatureToColor(data.min_temp);
-  
+
   // Disegna il bordo attorno al cerchio con spessore proporzionale
   stroke(borderColorForMinTemp);
   let borderThickness = map(size, minCircleSize, maxCircleSize, 4, 16); // Esempio di variabilità del bordo
@@ -85,46 +85,61 @@ function drawGlyphs(x, y, size, data) {
   strokeWeight(0); // Assicurati che il cerchio principale non abbia contorni
   ellipse(x, y, size - borderThickness, size - borderThickness); // Riduci il cerchio principale in base allo spessore del bordo
 
+  stroke(255); 
+  strokeWeight(0.9);
+  
+  let margin = 0.4 * size; 
+  let smallSize = size - margin;
+  
+  let size1 = smallSize / numAcross;
+  let len = size1 * 0.3;
 
+  for (let xi = -smallSize / 2 + size1 / 2; xi < smallSize / 2; xi += size1) {
+      for (let yi = -smallSize / 2 + size1 / 2; yi < smallSize / 2; yi += size1) {
+          let oldX = x + xi;
+          let oldY = y + yi;
 
-    stroke(255); 
-    strokeWeight(0.9);
-    
-    let margin = 0.4 * size; 
-    let smallSize = size - margin;
-    
-    let size1 = smallSize / numAcross;
-    len = size1 * 0.3;
+          for (let i = 0; i < 20; i++) {
+              let n3 = noise((oldX + 200) * rez3, (oldY + 200) * rez3) + 0.033;
+              let ang = map(n3, 0.3, 0.7, 0, PI * 2);
+              
+              let newX = cos(ang) * len + oldX;
+              let newY = sin(ang) * len + oldY;
+              line(oldX, oldY, newX, newY);
+              oldX = newX;
+              oldY = newY;
+          }
+      }
+  }
 
-    for (let xi = -smallSize / 2 + size1 / 2; xi < smallSize / 2; xi += size1) {
-        for (let yi = -smallSize / 2 + size1 / 2; yi < smallSize / 2; yi += size1) {
-            let oldX = x + xi;
-            let oldY = y + yi;
+  // Scrivere il nome del fiume sotto al cerchio
+  fill(textColor);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  textFont("Georgia");
 
-            for (let i = 0; i < 20; i++) {
-                let n3 = noise((oldX + 200) * rez3, (oldY + 200) * rez3) + 0.033;
-                let ang = map(n3, 0.3, 0.7, 0, PI * 2);
-                
-                let newX = cos(ang) * len + oldX;
-                let newY = sin(ang) * len + oldY;
-                line(oldX, oldY, newX, newY);
-                oldX = newX;
-                oldY = newY;
-            }
-        }
-    }
+  // Gestione del testo per disporlo su due righe
+  let riverName = data.name;
+  let maxLineWidth = size; // Imposta la larghezza massima accettabile per una riga
+  let words = riverName.split(' '); // Suddividi il testo in parole
+  let lines = [];
+  let currentLine = '';
 
-    // Scrivere il nome del fiume sotto al cerchio
-    fill(textColor);
-    textAlign(CENTER, CENTER);
-    textSize(14);
-    textFont("Georgia");
-    text(data.name, x, y + size / 2 + 27);
-}
+  for (let word of words) {
+      let testLine = currentLine + (currentLine.length > 0 ? ' ' : '') + word;
+      let testWidth = textWidth(testLine);
+      if (testWidth > maxLineWidth) {
+          lines.push(currentLine);
+          currentLine = word;
+      } else {
+          currentLine = testLine;
+      }
+  }
+  lines.push(currentLine); // Aggiungi l'ultima linea
 
-function windowResized() {
-    let totalCircles = data.getRowCount();
-    let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 100;
-    resizeCanvas(windowWidth, canvasHeight);
-    setup(); // Ridisegna i glifi al ridimensionamento della finestra
+  // Disegna il testo a più righe
+  let lineHeight = 18; // Altezza della riga
+  for (let i = 0; i < lines.length; i++) {
+      text(lines[i], x, y + size / 2 + 27 + i * lineHeight);
+  }
 }
