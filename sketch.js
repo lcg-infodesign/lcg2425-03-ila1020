@@ -8,53 +8,55 @@ let textColor = "#040404";
 let pageColor = "#ededed";
 
 let minCircleSize = 50; // Minimum circle size
-let maxCircleSize = 300; // Maximum circle size
-let numAcross = 5; // Number of glyphs across a row
+let maxCircleSize = 170; // Maximum circle size
+let numAcross = 3; // Number of glyphs across a row (changed to 4)
 let rez3 = 0.02; 
 let len; 
 
 function setup() {
-    let totalCircles = data.getRowCount();
+  let totalCircles = data.getRowCount();
 
-    // Calculate total canvas height based on number of circles and their arrangement
-    let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 100; 
-    resizeCanvas(windowWidth, canvasHeight);
-    
-    // Set the background color
-    background(pageColor);
-    
-    // Position start variables
-    let ypos = 100;
+  // Calculate total canvas height based on number of circles and their arrangement
+  let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100);
+  resizeCanvas(windowWidth, canvasHeight);
+  
+  // Set the background color
+  background(pageColor);
+  
+  // Position start variables
+  let ypos = 100;
 
-    // Find min and max lengths for scaling
-    let minLength = Infinity;
-    let maxLength = -Infinity;
+  // Find min and max lengths for scaling
+  let minLength = Infinity;
+  let maxLength = -Infinity;
 
-    for (let i = 0; i < totalCircles; i++) {
-        let length = data.getNum(i, 'length');
-        minLength = min(minLength, length);
-        maxLength = max(maxLength, length);
-    }
+  for (let i = 0; i < totalCircles; i++) {
+      let length = data.getNum(i, 'length');
+      minLength = min(minLength, length);
+      maxLength = max(maxLength, length);
+  }
 
-    // Draw circles based on the length
-    for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
-        let xpos = (width - (numAcross * (minCircleSize + 100) - 100)) / 2; // Centering
+  // Draw circles based on the length
+  for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
+      let xpos = (width - (numAcross * (minCircleSize + 100) - 100)) / 2; // Centering
 
-        for (let col = 0; col < numAcross; col++) {
-            let index = row * numAcross + col;
-            if (index >= totalCircles) break; // Stop if there are no more circles
+      for (let col = 0; col < numAcross; col++) {
+          let index = row * numAcross + col;
+          if (index >= totalCircles) break; // Stop if there are no more circles
 
-            let item = data.getObject()[index];
-            let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
+          let item = data.getObject()[index];
+          let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
 
-            drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
+          drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
 
-            xpos += circleSize + 100; // Move to next circle position
-        }
+          xpos += circleSize + 100; // Move to the next circle position
+      }
 
-        ypos += maxCircleSize + 100; // Move down to next row
-    }
+      ypos += maxCircleSize + 100; // Move down to next row
+  }
 }
+
+
 
 // Map temperature to color
 function mapTemperatureToColor(temp) {
