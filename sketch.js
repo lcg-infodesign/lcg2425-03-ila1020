@@ -11,7 +11,7 @@ let minCircleSize = 50; // Minimum circle size
 let maxCircleSize = 300; // Maximum circle size
 let numAcross = 30; 
 let rez3 = 0.02; 
-let len; 
+let len; //
 
 function setup() {
   let totalCircles = data.getRowCount();
