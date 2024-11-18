@@ -24,7 +24,6 @@ function setup() {
     background(pageColor);
     
     // Position start variables
-    let xpos = 100;
     let ypos = 100;
 
     // Find min and max lengths for scaling
@@ -38,19 +37,22 @@ function setup() {
     }
 
     // Draw circles based on the length
-    for (let i = 0; i < totalCircles; i++) {
-        let item = data.getObject()[i];
-        let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
+    for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
+        let xpos = (width - (numAcross * (minCircleSize + 100) - 100)) / 2; // Centering
 
-        drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
+        for (let col = 0; col < numAcross; col++) {
+            let index = row * numAcross + col;
+            if (index >= totalCircles) break; // Stop if there are no more circles
 
-        xpos += circleSize + 100;
+            let item = data.getObject()[index];
+            let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
 
-        // Move to next row if necessary
-        if (xpos > width - circleSize) {
-            xpos = 100;
-            ypos += maxCircleSize + 100; 
+            drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
+
+            xpos += circleSize + 100; // Move to next circle position
         }
+
+        ypos += maxCircleSize + 100; // Move down to next row
     }
 }
 
@@ -122,3 +124,4 @@ function windowResized() {
     resizeCanvas(windowWidth, canvasHeight);
     setup(); // Redraw glyphs on window resize
 }
+
