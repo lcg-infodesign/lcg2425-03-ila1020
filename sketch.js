@@ -16,7 +16,10 @@ let len; // Lunghezza per il pattern di rumore
 
 function setup() {
   // Crea un'area di disegno che riempie la finestra
-  createCanvas(windowWidth, windowHeight);
+   // Calcola la dimensione della canvas in base al numero totale di cerchi
+   let totalCircles = data.getRowCount();
+   let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100; // Calcola l'altezza totale
+   createCanvas(windowWidth, canvasHeight); // Crea una canvas con altezza calcolata
 
   // Imposta il colore di sfondo della pagina
   background(pageColor);
