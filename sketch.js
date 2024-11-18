@@ -13,26 +13,22 @@ let numAcross = 30;
 let rez3 = 0.02; 
 let len; 
 
-
-
-
 function setup() {
   let totalCircles = data.getRowCount();
   
-  // Calcola l'altezza totale del canvas
+  // Calculate total canvas height
   let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 100; 
   createCanvas(windowWidth, canvasHeight);
 
-  // Imposta il colore di sfondo
+  // Set background color
   background(pageColor);
   let xpos = 100;
   let ypos = 100;
 
-  // Determina i valori minimo e massimo della lunghezza
+  // Determine min and max lengths
   let minLength = Infinity;
   let maxLength = -Infinity;
 
-  // Trova la lunghezza minima e massima
   for (let i = 0; i < totalCircles; i++) {
     let item = data.getObject()[i];
     let length = item.length;
@@ -40,17 +36,17 @@ function setup() {
     maxLength = max(maxLength, length);
   }
 
-  // Disegna i cerchi in base alla lunghezza
+  // Draw circles based on length
   for (let i = 0; i < totalCircles; i++) {
     let item = data.getObject()[i];
-    // Mappa la lunghezza del fiume alla dimensione del cerchio
+    // Map river length to circle size
     let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
 
     drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
 
     xpos += circleSize + 100;
 
-    // Controlla se è necessario passare alla riga successiva
+    // Move to the next row if needed
     if (xpos > width - circleSize) {
       xpos = 100;
       ypos += maxCircleSize + 100; 
@@ -58,8 +54,7 @@ function setup() {
   }
 }
 
-
-// Mappatura della temperatura a colori
+// Map temperature to color
 function mapTemperatureToColor(temp) {
   let minTemp = 5;
   let maxTemp = 30;
@@ -73,14 +68,17 @@ function mapTemperatureToColor(temp) {
   return color(r, g, b);
 }
 
-
-
-
-
 function drawGlyphs(x, y, size, data) {
   let colorForTemp = mapTemperatureToColor(data.max_temp);
+  let borderColorForMinTemp = mapTemperatureToColor(data.min_temp);
+  
+  // Draw the main circle
   fill(colorForTemp);
-  noStroke();
+  ellipse(x, y, size, size);
+
+  // Draw the border around the circle
+  stroke(borderColorForMinTemp);
+  strokeWeight(20); // Adjust border thickness as necessary
   ellipse(x, y, size, size);
 
   stroke(255); 
@@ -110,7 +108,7 @@ function drawGlyphs(x, y, size, data) {
     }
   }
 
-  // Scrivi il nome del fiume sotto il cerchio
+  // Write the river name under the circle
   fill(textColor);
   textAlign(CENTER, CENTER);
   textSize(14);
@@ -122,5 +120,6 @@ function windowResized() {
   let totalCircles = data.getRowCount();
   let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 100;
   resizeCanvas(windowWidth, canvasHeight);
-  setup(); // Ripeti il setup per disegnare di nuovo i glyphs
+  setup(); // Redraw glyphs on window resize
 }
+
