@@ -1,83 +1,64 @@
 let data;
 
 function preload() {
-  // Carica i dati dal CSV
   data = loadTable("rivers-data.csv", "csv", "header");
 }
 
-// Definisci alcune variabili globali per colori e dimensioni
-let textColor = "#040404"; // Colore del testo
-let pageColor = "#ededed"; // Colore di sfondo della pagina
+let textColor = "#040404";
+let pageColor = "#ededed";
 
-let circleSize = 250; // Dimensione dei cerchi principali (ingrandita)
-let numAcross = 50; // Numero di pattern in orizzontale
-let rez3 = 0.009; // Risoluzione del rumore
-let len; // Lunghezza per il pattern di rumore
+let circleSize = 400;
+let numAcross = 40; 
+let rez3 = 0.02; 
+let len; 
 
 function setup() {
-  // Crea un'area di disegno che riempie la finestra
-   // Calcola la dimensione della canvas in base al numero totale di cerchi
-   let totalCircles = data.getRowCount();
-   let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100; // Calcola l'altezza totale
-   createCanvas(windowWidth, canvasHeight); // Crea una canvas con altezza calcolata
+  // Crea una canvas che riempie la larghezza della finestra
+  let totalCircles = data.getRowCount();
+  let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100; // Calcola l'altezza totale
+  createCanvas(windowWidth, canvasHeight);
 
-  // Imposta il colore di sfondo della pagina
+  // Imposta il colore di sfondo
   background(pageColor);
-
-  // Posizioni iniziali per disegnare i cerchi
   let xpos = 100 + circleSize / 2;
   let ypos = 100 + circleSize / 2;
 
-  // Ciclo per disegnare un cerchio per ogni fiume nel dataset
   for (let i = 0; i < data.getRowCount(); i++) {
     let item = data.getObject()[i];
-
-    // Chiama la funzione per disegnare i glyph (cerchi con pattern di rumore)
     drawGlyphs(xpos, ypos, circleSize, item);
 
-    // Incrementa la posizione x per il cerchio successivo
-    xpos += circleSize + 100; // Regola il distanziamento orizzontale
+    xpos += circleSize + 100;
 
-    // Se la posizione x supera la larghezza, passa alla riga successiva
     if (xpos > width - circleSize) {
       xpos = 100 + circleSize / 2;
-      ypos += circleSize + 100; // Regola il distanziamento verticale
+      ypos += circleSize + 100; 
     }
   }
 }
 
+// Mappatura della temperatura a colori
 function mapTemperatureToColor(temp) {
-  // Mappa il valore di max_temp (da -20 a 30) a un range di colori
-  // Puoi regolare i valori min e max in base ai tuoi dati
-  let minTemp = -20;
+  let minTemp = 5;
   let maxTemp = 30;
   
-  // Normalizza il valore di max_temp nella gamma [0, 1]
   let normTemp = constrain(map(temp, minTemp, maxTemp, 0, 1), 0, 1);
   
-  // Interpolazione del colore: da blu (basso) a rosso (alto)
-  let r = normTemp * 255; // Rosso
-  let g = 0; // Verde fisso
-  let b = (1 - normTemp) * 255; // Blu
+  let r = normTemp * 255;
+  let g = 0; 
+  let b = (1 - normTemp) * 255;
   
   return color(r, g, b);
 }
 
-
 function drawGlyphs(x, y, size, data) {
-  // Mappa la temperatura massima a un colore
   let colorForTemp = mapTemperatureToColor(data.max_temp);
-
-  // Disegna il cerchio di sfondo
   fill(colorForTemp);
   noStroke();
   ellipse(x, y, size, size);
 
-  // Disegna il pattern di rumore all'interno del cerchio
-  stroke(0, 200);
-  strokeWeight(0.6);
+  stroke(255); 
+  strokeWeight(0.9);
   
-  // Mantieni un margine di 40 per garantire che il pattern sia più piccolo dell'ellisse
   let margin = 0.4 * size; 
   let smallSize = size - margin;
   
@@ -107,5 +88,10 @@ function drawGlyphs(x, y, size, data) {
   textAlign(CENTER, CENTER);
   textSize(14);
   textFont("Georgia");
-  text(data.name, x, y + size / 2 + 50);
+  text(data.name, x, y + size / 2 + 27);
+}
+
+// Gestione del ridimensionamento della finestra
+function windowResized() {
+  resizeCanvas(windowWidth, canvas.height);
 }
