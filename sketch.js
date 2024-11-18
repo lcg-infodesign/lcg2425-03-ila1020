@@ -91,35 +91,48 @@ function drawGlyphs(x, y, size, data) {
   len = size1 * 0.3;
 
   for (let xi = -smallSize / 2 + size1 / 2; xi < smallSize / 2; xi += size1) {
-    for (let yi = -smallSize / 2 + size1 / 2; yi < smallSize / 2; yi += size1) {
-      let oldX = x + xi;
-      let oldY = y + yi;
+      for (let yi = -smallSize / 2 + size1 / 2; yi < smallSize / 2; yi += size1) {
+          let oldX = x + xi;
+          let oldY = y + yi;
 
-      for (let i = 0; i < 20; i++) {
-        let n3 = noise((oldX + 200) * rez3, (oldY + 200) * rez3) + 0.033;
-        let ang = map(n3, 0.3, 0.7, 0, PI * 2);
-        
-        let newX = cos(ang) * len + oldX;
-        let newY = sin(ang) * len + oldY;
-        line(oldX, oldY, newX, newY);
-        oldX = newX;
-        oldY = newY;
+          for (let i = 0; i < 20; i++) {
+              let n3 = noise((oldX + 200) * rez3, (oldY + 200) * rez3) + 0.033;
+              let ang = map(n3, 0.3, 0.7, 0, PI * 2);
+              
+              let newX = cos(ang) * len + oldX;
+              let newY = sin(ang) * len + oldY;
+              line(oldX, oldY, newX, newY);
+              oldX = newX;
+              oldY = newY;
+          }
       }
-    }
   }
 
-  // Write the river name under the circle
-  fill(textColor);
-  textAlign(CENTER, CENTER);
-  textSize(14);
-  textFont("Georgia");
-  text(data.name, x, y + size / 2 + 27);
-}
-
-function windowResized() {
-  let totalCircles = data.getRowCount();
-  let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 100;
-  resizeCanvas(windowWidth, canvasHeight);
-  setup(); // Redraw glyphs on window resize
-}
-
+    // Scrivi il nome del fiume intorno al cerchio
+    fill(textColor);
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    textFont("Georgia-Bold"); // Imposta il font in grassetto
+  
+    let name = data.name.toUpperCase(); // Converti il nome in maiuscolo
+    let startAngle = PI; // Angolo da cui iniziare a scrivere il testo
+    let endAngle = startAngle +TWO_PI; // Angolo da cui fermarsi a scrivere il testo (solo la parte superiore del cerchio)
+    
+    let letterSpacingFactor = 1.5; // Regola questo valore per aumentare o diminuire la spaziatura
+    for (let i = 0; i < name.length; i++) {
+        let angle = map(i, 0, name.length * letterSpacingFactor, startAngle, endAngle);
+        let letterX = x + cos(angle) * (size / 2 + 20); // Raggio del cerchio incrementato per spaziatura
+        let letterY = y + sin(angle) * (size / 2 + 20);
+  
+        // Regola letterY per allineare la base
+        let baselineOffset = 5; // Regola questo valore secondo le tue preferenze
+        letterY += baselineOffset;
+  
+        // Imposta la rotazione del testo
+        push(); // Salva le impostazioni correnti di disegno
+        translate(letterX, letterY); // Passa alla posizione della lettera
+        rotate(angle + HALF_PI); // Ruota il testo per allinearlo con il bordo del cerchio
+        text(name.charAt(i), 0, 0); // Disegna il testo a '0,0' perché siamo già traslati
+        pop(); // Ripristina le impostazioni originali
+    }
+  }
