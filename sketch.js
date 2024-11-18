@@ -7,58 +7,56 @@ function preload() {
 let textColor = "#040404";
 let pageColor = "#ededed";
 
-let minCircleSize = 50; // Minimum circle size
-let maxCircleSize = 170; // Maximum circle size
-let numAcross = 3; // Number of glyphs across a row (changed to 4)
+let minCircleSize = 50; // Dimensione minima del cerchio
+let maxCircleSize = 170; // Dimensione massima del cerchio
+let numAcross = 3; // Numero di glifi per riga
 let rez3 = 0.02; 
 let len; 
 
 function setup() {
-  let totalCircles = data.getRowCount();
+    let totalCircles = data.getRowCount();
 
-  // Calculate total canvas height based on number of circles and their arrangement
-  let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100);
-  resizeCanvas(windowWidth, canvasHeight);
-  
-  // Set the background color
-  background(pageColor);
-  
-  // Position start variables
-  let ypos = 100;
+    // Calcolare l'altezza totale della canvas in base al numero di cerchi
+    let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100);
+    resizeCanvas(windowWidth, canvasHeight);
+    
+    // Imposta il colore di sfondo
+    background(pageColor);
+    
+    // Le variabili per la posizione iniziale
+    let ypos = 100;
 
-  // Find min and max lengths for scaling
-  let minLength = Infinity;
-  let maxLength = -Infinity;
+    // Trova le lunghezze minime e massime per lo scaling
+    let minLength = Infinity;
+    let maxLength = -Infinity;
 
-  for (let i = 0; i < totalCircles; i++) {
-      let length = data.getNum(i, 'length');
-      minLength = min(minLength, length);
-      maxLength = max(maxLength, length);
-  }
+    for (let i = 0; i < totalCircles; i++) {
+        let length = data.getNum(i, 'length');
+        minLength = min(minLength, length);
+        maxLength = max(maxLength, length);
+    }
 
-  // Draw circles based on the length
-  for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
-      let xpos = (width - (numAcross * (minCircleSize + 100) - 100)) / 2; // Centering
+    // Disegna cerchi in base alla lunghezza
+    for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
+        let xpos = (width - (numAcross * (maxCircleSize + 100) - 100)) / 2; // Centratura della riga
 
-      for (let col = 0; col < numAcross; col++) {
-          let index = row * numAcross + col;
-          if (index >= totalCircles) break; // Stop if there are no more circles
+        for (let col = 0; col < numAcross; col++) {
+            let index = row * numAcross + col;
+            if (index >= totalCircles) break; // Ferma se non ci sono più cerchi
 
-          let item = data.getObject()[index];
-          let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
+            let item = data.getObject()[index];
+            let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
 
-          drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
+            drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
 
-          xpos += circleSize + 100; // Move to the next circle position
-      }
+            xpos += circleSize + 100; // Spostamento alla posizione del cerchio successivo
+        }
 
-      ypos += maxCircleSize + 100; // Move down to next row
-  }
+        ypos += maxCircleSize + 100; // Scendi alla prossima riga
+    }
 }
 
-
-
-// Map temperature to color
+// Mappa la temperatura e colore
 function mapTemperatureToColor(temp) {
     let minTemp = 5;
     let maxTemp = 30;
@@ -73,17 +71,21 @@ function mapTemperatureToColor(temp) {
 }
 
 function drawGlyphs(x, y, size, data) {
-    let colorForTemp = mapTemperatureToColor(data.max_temp);
-    let borderColorForMinTemp = mapTemperatureToColor(data.min_temp);
-    
-    // Draw the main circle
-    fill(colorForTemp);
-    ellipse(x, y, size, size);
+  let colorForTemp = mapTemperatureToColor(data.max_temp);
+  let borderColorForMinTemp = mapTemperatureToColor(data.min_temp);
+  
+  // Disegna il bordo attorno al cerchio con spessore proporzionale
+  stroke(borderColorForMinTemp);
+  let borderThickness = map(size, minCircleSize, maxCircleSize, 4, 16); // Esempio di variabilità del bordo
+  strokeWeight(borderThickness);
+  ellipse(x, y, size, size);
 
-    // Draw the border around the circle
-    stroke(borderColorForMinTemp);
-    strokeWeight(20);
-    ellipse(x, y, size, size);
+  // Disegna il cerchio principale
+  fill(colorForTemp);
+  strokeWeight(0); // Assicurati che il cerchio principale non abbia contorni
+  ellipse(x, y, size - borderThickness, size - borderThickness); // Riduci il cerchio principale in base allo spessore del bordo
+
+
 
     stroke(255); 
     strokeWeight(0.9);
@@ -112,7 +114,7 @@ function drawGlyphs(x, y, size, data) {
         }
     }
 
-    // Write the river name under the circle
+    // Scrivere il nome del fiume sotto al cerchio
     fill(textColor);
     textAlign(CENTER, CENTER);
     textSize(14);
@@ -124,6 +126,5 @@ function windowResized() {
     let totalCircles = data.getRowCount();
     let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 100;
     resizeCanvas(windowWidth, canvasHeight);
-    setup(); // Redraw glyphs on window resize
+    setup(); // Ridisegna i glifi al ridimensionamento della finestra
 }
-
