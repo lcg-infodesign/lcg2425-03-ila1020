@@ -77,18 +77,22 @@ function setup() {
 
   // Numero di righe in base al numero totale dei cerchi e al fatto che in ogni riga ce ne possono essere solo 4
   for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
-      let xpos = (width - (numAcross * maxCircleSize - 100)) / 2; // Centratura della riga
+      let xpos = (width - (numAcross * (maxCircleSize + 100) - 100)) / 2; // Centratura della riga
 
       
-
-
+      
       for (let col = 0; col < numAcross; col++) {
           let index = row * numAcross + col;
-          if (index >= totalCircles) break; // Ferma se non ci sono più cerchi
+          if (index >= totalCircles) break; // si ferma se non ci sono più cerchi
 
+
+//recupero un elemento dalla struttura dati
           let item = data.getObject()[index];
+
+          //la dimensione del cerchio viene calcolata il relazione ai valori di lunghezza del dataset
           let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
 
+          //richiamo alla funzione per il disegno dei glifi nella posizione data
           drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
 
           xpos += circleSize + 100; // Spostamento alla posizione del cerchio successivo
@@ -100,35 +104,48 @@ function setup() {
 }
 
 
-// Mappa la temperatura e colore
+
+
+// Mappa la temperatura associata al colore
+//in questo caso, a colori più sul blu sono associate temperature più basse, a colori più sul rosso  temperature più alte
 function mapTemperatureToColor(temp) {
     let minTemp = 5;
     let maxTemp = 30;
     
+    //il valore della temperatura viene mappato in un intervallo tra 0 e 1, senza che esca dagli estremi (constrain)
     let normTemp = constrain(map(temp, minTemp, maxTemp, 0, 1), 0, 1);
     
-    let r = normTemp * 255;
+    let r = normTemp * 255; //colore temperatura più alta = rosso
     let g = 0; 
-    let b = (1 - normTemp) * 255;
+    let b = (1 - normTemp) * 255;//più bassa, blu
     
     return color(r, g, b);
 }
 
+
+
+// GLIFI
+
 function drawGlyphs(x, y, size, data) {
-    let colorForTemp = mapTemperatureToColor(data.max_temp);
-    let borderColorForMinTemp = mapTemperatureToColor(data.min_temp);
+    let colorForTemp = mapTemperatureToColor(data.max_temp); //per la temperatura più alta
+    let borderColorForMinTemp = mapTemperatureToColor(data.min_temp); //per la temperatura più bassa
 
     // Disegna il bordo attorno al cerchio con spessore proporzionale
     stroke(borderColorForMinTemp);
-    let borderThickness = map(size, minCircleSize, maxCircleSize, 4, 16); // Esempio di variabilità del bordo
+    let borderThickness = map(size, minCircleSize, maxCircleSize, 4, 16); //variabilità del bordo
     strokeWeight(borderThickness);
     ellipse(x, y, size, size);
 
-    // Disegna il cerchio principale
+    //cerchio principale
     fill(colorForTemp);
-    strokeWeight(0); // Assicurati che il cerchio principale non abbia contorni
+
     ellipse(x, y, size - borderThickness, size - borderThickness); // Riduci il cerchio principale in base allo spessore del bordo
 
+
+
+
+
+    //pattern tipo fiume
     stroke(255); 
     strokeWeight(0.9);
     
@@ -156,19 +173,26 @@ function drawGlyphs(x, y, size, data) {
         }
     }
 
-    // Scrivere il nome del fiume sotto al cerchio
+
+
+
+    // nome del fiume sotto al cerchio
     fill(textColor);
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(12); // Dimensione del testo più piccola
-    textFont("Georgia"); // Assicurati di usare un carattere che supporta il grassetto
+    textSize(12); 
+    textFont("Georgia"); 
 
-    // Converti il nome del fiume in maiuscolo
+    // nome in maiuscolo
     let riverName = data.name.toUpperCase();
-    let maxLineWidth = size; // Imposta la larghezza massima accettabile per una riga
-    let words = riverName.split(' '); // Suddividi il testo in parole
+    let maxLineWidth = size; // larghezza massima accettabile per una riga
+    let words = riverName.split(' '); // il testo suddiviso in parole
+    
+    //un array per memorizzare le linee ed una variabile per costruire la riga corrente
     let lines = [];
     let currentLine = '';
+
+
 
     for (let word of words) {
         let testLine = currentLine + (currentLine.length > 0 ? ' ' : '') + word;
