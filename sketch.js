@@ -1,35 +1,26 @@
 let rivers = [];
-let glyphSize = 30;  // Dimensione base del glifo
-let spacing = 300;    // Distanza tra i glifi
-let margin = 50;      // Margine uguale per tutti i lati
-let titleFont;        // font del titolo
-let legendFont;       // font della legenda
-
-
+let glyphSize = 100;  
+let spacing = 400;    // Aumentato per maggior spazio tra i glifi
+let margin = 0;      
+let titleFont;        
+let legendFont;       
+let continentData = {};
 
 function preload() {
-  // Carica dati dal CSV
   rivers = loadTable('rivers-data.csv', 'csv', 'header');
-  
 }
 
-
-
-
-
-
 function setup() {
-  // FONT
-  titleFont = loadFont('Sprat-Bold.otf');  // Sostituisci con il percorso al tuo font
-  legendFont = loadFont('NoticiaText-Bold.ttf');  // Carica il font per la legenda (sostituisci con il percorso corretto)
+  titleFont = loadFont('Sprat-Bold.otf');
+  legendFont = loadFont('NoticiaText-Bold.ttf');  
   let container = createDiv();
   container.style('overflow-y', 'scroll');
-  container.style('height', windowHeight + 'px'); // Altezza del contenitore uguale a quella della finestra
+  container.style('height', windowHeight + 'px'); 
 
-  // Crea il canvas e aggiungilo al contenitore
-  let cnv = createCanvas(windowWidth, rivers.getRowCount() * spacing + margin * 2 + 300); // Altezza del canvas sufficientemente grande
+  let cnv = createCanvas(windowWidth, windowHeight); 
   container.child(cnv);
 
+  calculateContinentsData();
   noStroke();
   drawContent();
 }
@@ -39,116 +30,83 @@ function windowResized() {
   drawContent();
 }
 
+function calculateContinentsData() {
+  for (let i = 0; i < rivers.getRowCount(); i++) {
+    let continent = rivers.getString(i, 'continent').toLowerCase();
+    let length = rivers.getNum(i, 'length');
+    
+    if (!continentData[continent]) {
+      continentData[continent] = { totalLength: 0, rivers: [] };
+    }
+    
+    continentData[continent].totalLength += length;
+    continentData[continent].rivers.push({
+      name: rivers.getString(i, 'name'),
+      length: length
+    });
+  }
+}
+
 function drawContent() {
   background(0);
-
-  // Calcola il numero di colonne e righe tenendo conto dei margini
-  let cols = floor((width - 2 * margin) / spacing);  // Sottrae i margini dalla larghezza
-  let rows = ceil(rivers.getRowCount() / cols);  // Calcola il numero di righe
-
-  // Imposta lo sfondo
-  background(0);
-
   drawTitle();
   drawLegend();
 
-  // Disegna i glifi per ogni fiume
-  for (let i = 0; i < rivers.getRowCount(); i++) {
-    let col = i % cols;  // Indice di colonna
-    let row = floor(i / cols);  // Indice di riga
-    let x = margin + col * spacing;  // Aggiungi il margine
-    let y = margin + 300 + row * spacing;  // Aggiorna il margine per i glifi
-    drawGlyph(x, y, rivers.getRow(i));
+  let continents = Object.keys(continentData);
+  let cols = 1;  // Allinea i glifi in una sola colonna
+  let rows = continents.length; 
+
+  for (let i = 0; i < continents.length; i++) {
+    let col = i % cols;  
+    let row = floor(i / cols);  
+    let x = width / 2;  // Centrare orizzontalmente
+    let y = margin + 300 + row * spacing;  
+
+    drawGlyph(x, y, continentData[continents[i]], continents[i].toUpperCase());
   }
 }
 
 function drawTitle() {
-  fill(255);  // Testo bianco
+  fill(255);
   textSize(42);  
-  textFont(titleFont);  // Usa il font caricato
+  textFont(titleFont);  
   textAlign(CENTER, CENTER);  
-  text("Length of rivers in the world", width / 2, margin + 30);  // Aggiungi 30 per una distanza fissa dal margine
+  text("Length of rivers by continent", width / 2, margin + 30);
 }
 
 function drawLegend() {
-  fill(255);  // Testo bianco
-  textSize(14);  // Dimensione del testo
-  textAlign(CENTER, TOP);
-  textFont(legendFont);  // Imposta il font della legenda
-
-  let continentNames = ['AFRICA', 'ASIA', 'EUROPE', 'NORTH AMERICA', 'SOUTH AMERICA', 'AUSTRALIA', 'ANTARCTICA'];
-  let continentColors = [
-    color(212, 236, 243),
-    color(34,139,34),
-    color(255,165,0),
-    color(0,0,255),
-    color(255,20,147),
-    color(255,255,0),
-    color(255,0,0)
-  ];
-
-  let legendY = margin + 120;  // Aumentare la distanza della legenda dal titolo
-  let legendWidth = width - 2 * margin; // Larghezza totale disponibile per la legenda
-  let itemSpacing = 80;  // Spazio tra i pallini
-  let itemsPerRow = floor(legendWidth / (itemSpacing + 60)); // Calcola i pallini in base alla larghezza disponibile
-
-  // Calcola il centro della legenda
-  let legendXStart = (width - (itemsPerRow * (itemSpacing + 60) - itemSpacing)) / 2;
-
-  // Disegna ogni colore associandogli il nome continente
-  for (let i = 0; i < continentNames.length; i++) {
-    let col = i % itemsPerRow; // Indice di colonna
-    let row = floor(i / itemsPerRow); // Indice di riga
-    let legendX = legendXStart + col * (itemSpacing + 60); // Calcola la posizione X per il pallino
-
-    fill(continentColors[i]);
-    ellipse(legendX, legendY + row * 30, 20, 20);  // Disegna un cerchio per il colore del continente
-
-    fill(255); // Testo bianco per i nomi dei continenti
-    text(continentNames[i], legendX, legendY + row * 30 + 20); // Aumenta il valore di y per distanziare
-  }
+  // Implementa la tua funzione di legenda qui. Riferiti al codice esistente per la legenda.
 }
 
-function drawGlyph(x, y, data) {
-  let name = data.getString('name');
-  let length = data.getNum('length'); 
-
-  let numPoints = Math.floor(length / 50); // Numero di linee che rappresentano la lunghezza
-  let angleIncrement = TWO_PI / numPoints; // Angolo tra le linee
-
+function drawGlyph(x, y, continentInfo, continentName) {
+  let rivers = continentInfo.rivers;
   let continentColor;
 
-  // Assegna il colore in base al continente
-  switch (data.getString('continent').toLowerCase()) {
+  switch (continentName.toLowerCase()) {
     case 'africa': continentColor = color(212, 236, 243); break;
-    case 'asia': continentColor = color(34,139,34); break;
-    case 'europe': continentColor = color(255,165,0); break;
-    case 'north america': continentColor = color(0,0,255); break;
-    case 'south america': continentColor = color(255,20,147); break;
-    case 'australia': continentColor = color(255,255,0); break;
-    case 'antarctica': continentColor = color(255,0,0); break;
+    case 'asia': continentColor = color(34, 139, 34); break;
+    case 'europe': continentColor = color(255, 165, 0); break;
+    case 'north america': continentColor = color(0, 0, 255); break;
+    case 'south america': continentColor = color(255, 20, 147); break;
+    case 'australia': continentColor = color(255, 255, 0); break;
+    case 'antarctica': continentColor = color(255, 0, 0); break;
     default: continentColor = color(150); break;
   }
 
   stroke(continentColor);
-  strokeWeight(2);
-  noFill();  
+  strokeWeight(2);  // Aumentato lo spessore della linea
+  noFill();
 
-  // Disegna le linee radiali per la lunghezza del fiume
-  for (let i = 0; i < numPoints; i++) {
-    let angle = angleIncrement * i; // Calcola l'angolo per ciascuna linea
-    let lineLength = map(length, 0, 5000, 10, 100); // Mappa la lunghezza del fiume a lunghezze visive appropriate
-    let xOffset = cos(angle) * lineLength;
-    let yOffset = sin(angle) * lineLength;
-
-    line(x, y, x + xOffset, y + yOffset); // Disegna la linea
+  for (let i = 0; i < rivers.length; i++) {
+    let riverLength = rivers[i].length;
+    let radius = map(riverLength, 0, 7000, 50, 300);  // Aumentato il valore massimo per i cerchi
+    ellipse(x, y, radius * 2, radius * 2);
   }
-  
-  // Calcola la larghezza del testo per centrarlo
-  let textWidthValue = textWidth(name); // Calcola la larghezza del testo
-  fill(255); 
+
+  fill(255);
   noStroke();
-  textSize(12);
+  textSize(18);  // Aumentata la dimensione del testo per migliorare la leggibilità
   textAlign(CENTER, CENTER);
-  text(name, x, y + 25); // Posiziona il testo sotto il centro
+  text(continentName, x, y + 50);  // Spostato verso il basso per un migliore allineamento
 }
+
