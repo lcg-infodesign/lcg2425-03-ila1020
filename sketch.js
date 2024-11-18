@@ -113,11 +113,12 @@ function drawGlyph(x, y, data) {
   let name = data.getString('name');
   let length = data.getNum('length'); 
 
-  let numPoints = Math.floor(length / 50);
-  let distanceBetweenPoints = 1; 
+  let numPoints = Math.floor(length / 50); // Numero di linee che rappresentano la lunghezza
+  let angleIncrement = TWO_PI / numPoints; // Angolo tra le linee
 
   let continentColor;
 
+  // Assegna il colore in base al continente
   switch (data.getString('continent').toLowerCase()) {
     case 'africa': continentColor = color(212, 236, 243); break;
     case 'asia': continentColor = color(34,139,34); break;
@@ -133,17 +134,15 @@ function drawGlyph(x, y, data) {
   strokeWeight(2);
   noFill();  
 
-  beginShape();
+  // Disegna le linee radiali per la lunghezza del fiume
   for (let i = 0; i < numPoints; i++) {
-    let angle = map(i, 0, numPoints, 0, TWO_PI * 4);
-    let r = distanceBetweenPoints * i;
+    let angle = angleIncrement * i; // Calcola l'angolo per ciascuna linea
+    let lineLength = map(length, 0, 5000, 10, 100); // Mappa la lunghezza del fiume a lunghezze visive appropriate
+    let xOffset = cos(angle) * lineLength;
+    let yOffset = sin(angle) * lineLength;
 
-    let xOffset = r * cos(angle);
-    let yOffset = r * sin(angle);
-
-    curveVertex(x + xOffset, y + yOffset);
+    line(x, y, x + xOffset, y + yOffset); // Disegna la linea
   }
-  endShape();
   
   // Calcola la larghezza del testo per centrarlo
   let textWidthValue = textWidth(name); // Calcola la larghezza del testo
@@ -151,6 +150,5 @@ function drawGlyph(x, y, data) {
   noStroke();
   textSize(12);
   textAlign(CENTER, CENTER);
-  // Modifica la posizione 'x' per centrare il testo sotto la spirale
-  text(name, x, y + 25); // Sposta il testo 'y' sotto la spirale
+  text(name, x, y + 25); // Posiziona il testo sotto il centro
 }
