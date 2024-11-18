@@ -1,5 +1,5 @@
 let rivers = [];
-let glyphSize = 20;  // Dimensione base del glifo
+let glyphSize = 30;  // Dimensione base del glifo
 let spacing = 300;    // Distanza tra i glifi
 let margin = 50;      // Margine uguale per tutti i lati
 let titleFont;        // font del titolo
@@ -11,13 +11,17 @@ function preload() {
   // Carica dati dal CSV
   rivers = loadTable('rivers-data.csv', 'csv', 'header');
   
+}
+
+
+
+
+
+
+function setup() {
   // FONT
   titleFont = loadFont('Sprat-Bold.otf');  // Sostituisci con il percorso al tuo font
   legendFont = loadFont('NoticiaText-Bold.ttf');  // Carica il font per la legenda (sostituisci con il percorso corretto)
-  
-}
-
-function setup() {
   let container = createDiv();
   container.style('overflow-y', 'scroll');
   container.style('height', windowHeight + 'px'); // Altezza del contenitore uguale a quella della finestra
