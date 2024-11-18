@@ -1,51 +1,86 @@
 let data;
-
+//carico i dati dal dataset
 function preload() {
     data = loadTable("rivers-data.csv", "csv", "header");
 }
 
-let textColor = "#040404";
-let pageColor = "#ededed";
 
+
+//VARIABILI VARIE
+let textColor = "#040404";
+let pageColor = "#deb887";
+
+
+//DIMENSIONE CERCHIO
 let minCircleSize = 50; // Dimensione minima del cerchio
 let maxCircleSize = 170; // Dimensione massima del cerchio
 let numAcross = 4; // Numero di glifi per riga
+
+//PATTERN che cerca di assomigliare al percorso di un fiume
 let rez3 = 0.02; 
-let len; 
+let len; //lunghezza delle linee del "pattern" bianco
+
+
+
+
+
+
+
 
 function setup() {
-  let totalCircles = data.getRowCount();
+  
+  let totalCircles = data.getRowCount(); //numero totale dei cerchi che corrisponde al numero totale dei fiumi nel dataset
 
-  // Calcolare l'altezza totale della canvas in base al numero di cerchi
+
+
+
+  // altezza totale della canvas in base al numero di cerchi, considerando anche lo spazio tra il nome del fiume e il cerchio
   let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 60; // +60 per il titolo
   resizeCanvas(windowWidth, canvasHeight);
   
-  // Imposta il colore di sfondo
+  
+
   background(pageColor);
   
-  // Disegna il titolo al centro in alto
+  // TITOLO
   fill(textColor);
   textAlign(CENTER, CENTER);
   textSize(32);
   textFont("Georgia");
   text("Temperature e lunghezza dei fiumi del mondo ", width / 2, 30); 
 
-  // Aumenta la distanza iniziale dal titolo
-  let ypos = 150; // Inizia a disegnare i cerchi sotto il titolo
 
-  // Trova le lunghezze minime e massime per lo scaling
+  // distanza iniziale dal titolo
+  let ypos = 200; // Inizia a disegnare i cerchi sotto il titolo
+
+
+
+
+
+
+  // per tenere traccia delle lunghezze minime e massime dei cerchi che verranno disegnati. Infinity e -Infinity vengono utilizzati per garantire che qualsiasi valore di lunghezza trovato nel ciclo successivo possa aggiornare queste variabili.
   let minLength = Infinity;
   let maxLength = -Infinity;
 
+
+
+//per ogni cerchio, viene estratto il dato sulla lunghezza dal dataset
   for (let i = 0; i < totalCircles; i++) {
       let length = data.getNum(i, 'length');
       minLength = min(minLength, length);
       maxLength = max(maxLength, length);
   }
+//confronta la lunghezza corrente con minLength e maxLength per aggiornare le lunghezze minime e massime.
 
-  // Disegna cerchi in base alla lunghezza
+
+
+
+  // Numero di righe in base al numero totale dei cerchi e al fatto che in ogni riga ce ne possono essere solo 4
   for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
-      let xpos = (width - (numAcross * (maxCircleSize + 100) - 100)) / 2; // Centratura della riga
+      let xpos = (width - (numAcross * maxCircleSize - 100)) / 2; // Centratura della riga
+
+      
+
 
       for (let col = 0; col < numAcross; col++) {
           let index = row * numAcross + col;
@@ -101,7 +136,7 @@ function drawGlyphs(x, y, size, data) {
     let smallSize = size - margin;
     
     let size1 = smallSize / numAcross;
-    let len = size1 * 0.3;
+    let len = size1 * 0.2;
 
     for (let xi = -smallSize / 2 + size1 / 2; xi < smallSize / 2; xi += size1) {
         for (let yi = -smallSize / 2 + size1 / 2; yi < smallSize / 2; yi += size1) {
@@ -123,6 +158,7 @@ function drawGlyphs(x, y, size, data) {
 
     // Scrivere il nome del fiume sotto al cerchio
     fill(textColor);
+    noStroke();
     textAlign(CENTER, CENTER);
     textSize(12); // Dimensione del testo più piccola
     textFont("Georgia"); // Assicurati di usare un carattere che supporta il grassetto
