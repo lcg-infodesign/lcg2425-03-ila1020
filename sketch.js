@@ -7,15 +7,14 @@ function preload() {
 let textColor = "#040404";
 let pageColor = "#ededed";
 
-let circleSize = 400;
-let numAcross = 40; 
+let circleSize = 300;
+let numAcross = 30; 
 let rez3 = 0.02; 
 let len; 
 
 function setup() {
   // Crea una canvas che riempie la larghezza della finestra
-  let totalCircles = data.getRowCount();
-  let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100; // Calcola l'altezza totale
+ 
   createCanvas(windowWidth, canvasHeight);
 
   // Imposta il colore di sfondo
@@ -91,9 +90,4 @@ function drawGlyphs(x, y, size, data) {
   text(data.name, x, y + size / 2 + 27);
 }
 
-function windowResized() {
-  let totalCircles = data.getRowCount();
-  let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100;
-  resizeCanvas(windowWidth, canvasHeight);
-}
 
