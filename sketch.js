@@ -14,7 +14,8 @@ let len;
 
 function setup() {
   // Crea una canvas che riempie la larghezza della finestra
- 
+  let totalCircles = data.getRowCount();
+  let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100; // Calcola l'altezza totale
   createCanvas(windowWidth, canvasHeight);
 
   // Imposta il colore di sfondo
@@ -90,4 +91,9 @@ function drawGlyphs(x, y, size, data) {
   text(data.name, x, y + size / 2 + 27);
 }
 
-
+function windowResized() {
+  let totalCircles = data.getRowCount();
+  let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100;
+  resizeCanvas(windowWidth, canvasHeight);
+  setup(); // Ripeti il setup per disegnare di nuovo i glyphs
+}
