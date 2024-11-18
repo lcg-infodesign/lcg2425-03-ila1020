@@ -16,43 +16,42 @@ let len; //
 function setup() {
   let totalCircles = data.getRowCount();
   
-  // Calculate total canvas height
+  // Calcola l'altezza totale della canvas
   let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 100; 
-  createCanvas(windowWidth, canvasHeight);
-
-  // Set background color
+  resizeCanvas(windowWidth, canvasHeight);
+  
+  // Imposta il colore di sfondo
   background(pageColor);
   let xpos = 100;
   let ypos = 100;
 
-  // Determine min and max lengths
+  // Trova lunghezza minima e massima
   let minLength = Infinity;
   let maxLength = -Infinity;
 
   for (let i = 0; i < totalCircles; i++) {
-    let item = data.getObject()[i];
-    let length = item.length;
+    let length = data.getNum(i, 'length'); // Assicurati di usare data.getNum per prendere i numeri
     minLength = min(minLength, length);
     maxLength = max(maxLength, length);
   }
 
-  // Draw circles based on length
+  // Disegna cerchi basati sulla lunghezza
   for (let i = 0; i < totalCircles; i++) {
     let item = data.getObject()[i];
-    // Map river length to circle size
     let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
 
     drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
 
     xpos += circleSize + 100;
 
-    // Move to the next row if needed
+    // Passa alla prossima riga se necessario
     if (xpos > width - circleSize) {
       xpos = 100;
       ypos += maxCircleSize + 100; 
     }
   }
 }
+
 
 // Map temperature to color
 function mapTemperatureToColor(temp) {
