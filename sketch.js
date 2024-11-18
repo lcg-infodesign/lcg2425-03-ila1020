@@ -91,7 +91,9 @@ function drawGlyphs(x, y, size, data) {
   text(data.name, x, y + size / 2 + 27);
 }
 
-// Gestione del ridimensionamento della finestra
 function windowResized() {
-  resizeCanvas(windowWidth, canvas.height);
+  let totalCircles = data.getRowCount();
+  let canvasHeight = Math.ceil(totalCircles / numAcross) * (circleSize + 100) + 100;
+  resizeCanvas(windowWidth, canvasHeight);
 }
+
