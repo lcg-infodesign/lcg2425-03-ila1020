@@ -9,52 +9,61 @@ let pageColor = "#ededed";
 
 let minCircleSize = 50; // Dimensione minima del cerchio
 let maxCircleSize = 170; // Dimensione massima del cerchio
-let numAcross = 3; // Numero di glifi per riga
+let numAcross = 4; // Numero di glifi per riga
 let rez3 = 0.02; 
 let len; 
 
 function setup() {
-    let totalCircles = data.getRowCount();
+  let totalCircles = data.getRowCount();
 
-    // Calcolare l'altezza totale della canvas in base al numero di cerchi
-    let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100);
-    resizeCanvas(windowWidth, canvasHeight);
-    
-    // Imposta il colore di sfondo
-    background(pageColor);
-    
-    // Le variabili per la posizione iniziale
-    let ypos = 100;
+  // Calcolare l'altezza totale della canvas in base al numero di cerchi
+  let canvasHeight = Math.ceil(totalCircles / numAcross) * (maxCircleSize + 100) + 60; // +60 per il titolo
+  resizeCanvas(windowWidth, canvasHeight);
+  
+  // Imposta il colore di sfondo
+  background(pageColor);
+  
+  // Disegna il titolo al centro in alto
+  fill(textColor);
+  textAlign(CENTER, CENTER);
+  textSize(32);
+  textFont("Georgia");
+  text("Temperature e lunghezza dei fiumi del mondo ", width / 2, 30); 
 
-    // Trova le lunghezze minime e massime per lo scaling
-    let minLength = Infinity;
-    let maxLength = -Infinity;
+  // Aumenta la distanza iniziale dal titolo
+  let ypos = 150; // Inizia a disegnare i cerchi sotto il titolo
 
-    for (let i = 0; i < totalCircles; i++) {
-        let length = data.getNum(i, 'length');
-        minLength = min(minLength, length);
-        maxLength = max(maxLength, length);
-    }
+  // Trova le lunghezze minime e massime per lo scaling
+  let minLength = Infinity;
+  let maxLength = -Infinity;
 
-    // Disegna cerchi in base alla lunghezza
-    for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
-        let xpos = (width - (numAcross * (maxCircleSize + 100) - 100)) / 2; // Centratura della riga
+  for (let i = 0; i < totalCircles; i++) {
+      let length = data.getNum(i, 'length');
+      minLength = min(minLength, length);
+      maxLength = max(maxLength, length);
+  }
 
-        for (let col = 0; col < numAcross; col++) {
-            let index = row * numAcross + col;
-            if (index >= totalCircles) break; // Ferma se non ci sono più cerchi
+  // Disegna cerchi in base alla lunghezza
+  for (let row = 0; row < Math.ceil(totalCircles / numAcross); row++) {
+      let xpos = (width - (numAcross * (maxCircleSize + 100) - 100)) / 2; // Centratura della riga
 
-            let item = data.getObject()[index];
-            let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
+      for (let col = 0; col < numAcross; col++) {
+          let index = row * numAcross + col;
+          if (index >= totalCircles) break; // Ferma se non ci sono più cerchi
 
-            drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
+          let item = data.getObject()[index];
+          let circleSize = map(item.length, minLength, maxLength, minCircleSize, maxCircleSize);
 
-            xpos += circleSize + 100; // Spostamento alla posizione del cerchio successivo
-        }
+          drawGlyphs(xpos + circleSize / 2, ypos + circleSize / 2, circleSize, item);
 
-        ypos += maxCircleSize + 100; // Scendi alla prossima riga
-    }
+          xpos += circleSize + 100; // Spostamento alla posizione del cerchio successivo
+      }
+
+      // Aumenta la distanza verticale tra le righe
+      ypos += maxCircleSize + 150; // Scendi alla prossima riga (aumentato da 100 a 150)
+  }
 }
+
 
 // Mappa la temperatura e colore
 function mapTemperatureToColor(temp) {
@@ -71,75 +80,76 @@ function mapTemperatureToColor(temp) {
 }
 
 function drawGlyphs(x, y, size, data) {
-  let colorForTemp = mapTemperatureToColor(data.max_temp);
-  let borderColorForMinTemp = mapTemperatureToColor(data.min_temp);
+    let colorForTemp = mapTemperatureToColor(data.max_temp);
+    let borderColorForMinTemp = mapTemperatureToColor(data.min_temp);
 
-  // Disegna il bordo attorno al cerchio con spessore proporzionale
-  stroke(borderColorForMinTemp);
-  let borderThickness = map(size, minCircleSize, maxCircleSize, 4, 16); // Esempio di variabilità del bordo
-  strokeWeight(borderThickness);
-  ellipse(x, y, size, size);
+    // Disegna il bordo attorno al cerchio con spessore proporzionale
+    stroke(borderColorForMinTemp);
+    let borderThickness = map(size, minCircleSize, maxCircleSize, 4, 16); // Esempio di variabilità del bordo
+    strokeWeight(borderThickness);
+    ellipse(x, y, size, size);
 
-  // Disegna il cerchio principale
-  fill(colorForTemp);
-  strokeWeight(0); // Assicurati che il cerchio principale non abbia contorni
-  ellipse(x, y, size - borderThickness, size - borderThickness); // Riduci il cerchio principale in base allo spessore del bordo
+    // Disegna il cerchio principale
+    fill(colorForTemp);
+    strokeWeight(0); // Assicurati che il cerchio principale non abbia contorni
+    ellipse(x, y, size - borderThickness, size - borderThickness); // Riduci il cerchio principale in base allo spessore del bordo
 
-  stroke(255); 
-  strokeWeight(0.9);
-  
-  let margin = 0.4 * size; 
-  let smallSize = size - margin;
-  
-  let size1 = smallSize / numAcross;
-  let len = size1 * 0.3;
+    stroke(255); 
+    strokeWeight(0.9);
+    
+    let margin = 0.4 * size; 
+    let smallSize = size - margin;
+    
+    let size1 = smallSize / numAcross;
+    let len = size1 * 0.3;
 
-  for (let xi = -smallSize / 2 + size1 / 2; xi < smallSize / 2; xi += size1) {
-      for (let yi = -smallSize / 2 + size1 / 2; yi < smallSize / 2; yi += size1) {
-          let oldX = x + xi;
-          let oldY = y + yi;
+    for (let xi = -smallSize / 2 + size1 / 2; xi < smallSize / 2; xi += size1) {
+        for (let yi = -smallSize / 2 + size1 / 2; yi < smallSize / 2; yi += size1) {
+            let oldX = x + xi;
+            let oldY = y + yi;
 
-          for (let i = 0; i < 20; i++) {
-              let n3 = noise((oldX + 200) * rez3, (oldY + 200) * rez3) + 0.033;
-              let ang = map(n3, 0.3, 0.7, 0, PI * 2);
-              
-              let newX = cos(ang) * len + oldX;
-              let newY = sin(ang) * len + oldY;
-              line(oldX, oldY, newX, newY);
-              oldX = newX;
-              oldY = newY;
-          }
-      }
-  }
+            for (let i = 0; i < 20; i++) {
+                let n3 = noise((oldX + 200) * rez3, (oldY + 200) * rez3) + 0.033;
+                let ang = map(n3, 0.3, 0.7, 0, PI * 2);
+                
+                let newX = cos(ang) * len + oldX;
+                let newY = sin(ang) * len + oldY;
+                line(oldX, oldY, newX, newY);
+                oldX = newX;
+                oldY = newY;
+            }
+        }
+    }
 
-  // Scrivere il nome del fiume sotto al cerchio
-  fill(textColor);
-  textAlign(CENTER, CENTER);
-  textSize(14);
-  textFont("Georgia");
+    // Scrivere il nome del fiume sotto al cerchio
+    fill(textColor);
+    textAlign(CENTER, CENTER);
+    textSize(12); // Dimensione del testo più piccola
+    textFont("Georgia"); // Assicurati di usare un carattere che supporta il grassetto
 
-  // Gestione del testo per disporlo su due righe
-  let riverName = data.name;
-  let maxLineWidth = size; // Imposta la larghezza massima accettabile per una riga
-  let words = riverName.split(' '); // Suddividi il testo in parole
-  let lines = [];
-  let currentLine = '';
+    // Converti il nome del fiume in maiuscolo
+    let riverName = data.name.toUpperCase();
+    let maxLineWidth = size; // Imposta la larghezza massima accettabile per una riga
+    let words = riverName.split(' '); // Suddividi il testo in parole
+    let lines = [];
+    let currentLine = '';
 
-  for (let word of words) {
-      let testLine = currentLine + (currentLine.length > 0 ? ' ' : '') + word;
-      let testWidth = textWidth(testLine);
-      if (testWidth > maxLineWidth) {
-          lines.push(currentLine);
-          currentLine = word;
-      } else {
-          currentLine = testLine;
-      }
-  }
-  lines.push(currentLine); // Aggiungi l'ultima linea
+    for (let word of words) {
+        let testLine = currentLine + (currentLine.length > 0 ? ' ' : '') + word;
+        let testWidth = textWidth(testLine);
+        if (testWidth > maxLineWidth) {
+            lines.push(currentLine);
+            currentLine = word;
+        } else {
+            currentLine = testLine;
+        }
+    }
+    lines.push(currentLine); // Aggiungi l'ultima linea
 
-  // Disegna il testo a più righe
-  let lineHeight = 18; // Altezza della riga
-  for (let i = 0; i < lines.length; i++) {
-      text(lines[i], x, y + size / 2 + 27 + i * lineHeight);
-  }
+    // Disegna il testo a più righe
+    let lineHeight = 14; // Altezza della riga più piccola per avvicinare il testo
+    for (let i = 0; i < lines.length; i++) {
+        text(lines[i], x, y + size / 2 + 20 + i * lineHeight); // Distanza verticale ridotta
+    }
 }
+
