@@ -22,8 +22,6 @@ function setup() {
 
   // Set background color
   background(pageColor);
-  let xpos = 100;
-  let ypos = 100;
 
   // Determine min and max lengths
   let minLength = Infinity;
@@ -35,6 +33,12 @@ function setup() {
     minLength = min(minLength, length);
     maxLength = max(maxLength, length);
   }
+
+  // Calculate starting position
+  let totalWidth = (numAcross * (maxCircleSize + 100)) - 100; // Minus one margin to fit the last circle
+  let startX = (width - totalWidth) / 2; // Center the circles horizontally
+  let xpos = startX; 
+  let ypos = 100;
 
   // Draw circles based on length
   for (let i = 0; i < totalCircles; i++) {
@@ -48,7 +52,7 @@ function setup() {
 
     // Move to the next row if needed
     if (xpos > width - circleSize) {
-      xpos = 100;
+      xpos = startX; // Reset to the calculated start position
       ypos += maxCircleSize + 100; 
     }
   }
@@ -108,31 +112,36 @@ function drawGlyphs(x, y, size, data) {
       }
   }
 
-    // Scrivi il nome del fiume intorno al cerchio
+    // Draw the river name around the circle
     fill(textColor);
     textAlign(CENTER, CENTER);
     textSize(16);
-    textFont("Georgia-Bold"); // Imposta il font in grassetto
+    textFont("Georgia-Bold"); // Set bold font
   
-    let name = data.name.toUpperCase(); // Converti il nome in maiuscolo
-    let startAngle = PI; // Angolo da cui iniziare a scrivere il testo
-    let endAngle = startAngle +TWO_PI; // Angolo da cui fermarsi a scrivere il testo (solo la parte superiore del cerchio)
+    let name = data.name.toUpperCase(); // Convert name to uppercase
+    let startAngle = PI; // Starting angle for text
+    let endAngle = startAngle + TWO_PI; // Stop angle for text (only the top half of the circle)
     
-    let letterSpacingFactor = 1.5; // Regola questo valore per aumentare o diminuire la spaziatura
+    let letterSpacingFactor = 1.5; // Adjust this value to increase or decrease spacing
     for (let i = 0; i < name.length; i++) {
         let angle = map(i, 0, name.length * letterSpacingFactor, startAngle, endAngle);
-        let letterX = x + cos(angle) * (size / 2 + 20); // Raggio del cerchio incrementato per spaziatura
+        let letterX = x + cos(angle) * (size / 2 + 20); // Radius incremented for spacing
         let letterY = y + sin(angle) * (size / 2 + 20);
   
-        // Regola letterY per allineare la base
-        let baselineOffset = 5; // Regola questo valore secondo le tue preferenze
+        // Adjust letterY for baseline alignment
+        let baselineOffset = 5; // Adjust according to your preferences
         letterY += baselineOffset;
   
-        // Imposta la rotazione del testo
-        push(); // Salva le impostazioni correnti di disegno
-        translate(letterX, letterY); // Passa alla posizione della lettera
-        rotate(angle + HALF_PI); // Ruota il testo per allinearlo con il bordo del cerchio
-        text(name.charAt(i), 0, 0); // Disegna il testo a '0,0' perché siamo già traslati
-        pop(); // Ripristina le impostazioni originali
+        // Set text rotation
+        push(); // Save current drawing settings
+        translate(letterX, letterY); // Move to letter position
+        rotate(angle + HALF_PI); // Rotate text to align with circle edge
+        text(name.charAt(i), 0, 0); // Draw text at '0,0' because we've already translated
+        pop(); // Restore drawing settings
     }
-  }
+}
+
+// You may also consider adding a windowResized function to adjust for window changes
+function windowResized() {
+  setup(); // Re-setup the canvas to adjust for new window size
+}
