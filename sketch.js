@@ -1,3 +1,8 @@
+//la dimensione dei cerchi è relativa alla lunghezza del fiume corrispondente
+//il colore interno riguarda la temperatura massima, il colore del bordo la temperatura minima
+//il rosso corrisponde alla temperatura massima, il blu alla temperatura minima
+
+
 let data; // Variabile per contenere i dati del dataset
 let coloretesto = "#040404"; 
 
@@ -20,6 +25,8 @@ let minLength = Infinity;
 let maxLength = -Infinity; 
 
 
+
+
 function setup() {
     let totalCircles = data.getRowCount(); // Ottieni il numero totale di cerchi da disegnare
 
@@ -34,6 +41,7 @@ function setup() {
         minTemp = min(minTemp, min_temp); // Aggiorna il valore minimo di temperatura
         maxTemp = max(maxTemp, max_temp); // Aggiorna il valore massimo di temperatura
     }
+
 
     // Calcolo dell'altezza del canvas in base al numero di cerchi e alle loro dimensioni
     let canvasHeight = Math.ceil(totalCircles / numGlifiXriga) * (maxCircleSize + 100) + 60;
@@ -101,7 +109,7 @@ function maptemperaturetocolor(temp) {
     let normTemp = constrain(map(temp, minTemp, maxTemp, 0, 1), 0, 1); // Normalizza la temperatura
     let r = normTemp * 255; // Calcola il valore rosso
     let b = (1 - normTemp) * 255; // Calcola il valore blu
-    return color(r, 0, b); // Restituisce il colore
+    return color(r, 0, b); 
 }
 
 // Funzione per disegnare il pattern all'interno del cerchio
