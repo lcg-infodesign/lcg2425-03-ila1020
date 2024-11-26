@@ -86,7 +86,8 @@ function drawglyphs(x, y, size, data) {
     let borderColorForMinTemp = maptemperaturetocolor(data.min_temp); // Ottiene il colore del bordo in base alla temperatura minima
 
     stroke(borderColorForMinTemp); 
-    strokeWeight(map(size, minCircleSize, maxCircleSize, 4, 40)); // Calcola lo spessore del bordo
+    strokeWeight(map(size, minCircleSize, maxCircleSize, 4, 40)); 
+    // Calcola lo spessore del bordo collegato alle misure dei cerchi
     
     ellipse(x, y, size, size); // Disegna il cerchio esterno
 
